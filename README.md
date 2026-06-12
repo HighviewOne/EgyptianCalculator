@@ -20,6 +20,10 @@
 
 *A fully functional calculator draped in the gold and mystery of ancient Egypt.*
 
+<br />
+
+<img src="screenshot.png" alt="Egyptian Calculator screenshot" width="480" />
+
 </div>
 
 ---

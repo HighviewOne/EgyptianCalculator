@@ -56,11 +56,11 @@ Numbers are converted to ancient Egyptian hieroglyphics in real time:
 |--------|-------|-----------|
 | Astonished Man | 1,000,000 | 𓁨 |
 | Tadpole | 100,000 | 𓆐 |
-| Pointing Finger | 10,000 | 𓂝 |
+| Pointing Finger | 10,000 | 𓂭 |
 | Lotus Flower | 1,000 | 𓆼 |
-| Coiled Rope | 100 | 𓏲 |
+| Coiled Rope | 100 | 𓍢 |
 | Hobble | 10 | 𓎆 |
-| Stroke | 1 | 𓏻 |
+| Stroke | 1 | 𓏺 |
 
 > Numbers up to **9,999,999** are supported in hieroglyphic form.
 

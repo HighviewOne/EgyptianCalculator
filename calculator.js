@@ -2,11 +2,11 @@
 const EGYPTIAN_GLYPHS = [
   { value: 1000000, glyph: '𓁨' }, // Astonished man
   { value: 100000,  glyph: '𓆐' }, // Tadpole
-  { value: 10000,   glyph: '𓂝' }, // Pointing finger
+  { value: 10000,   glyph: '𓂭' }, // Pointing finger
   { value: 1000,    glyph: '𓆼' }, // Lotus
-  { value: 100,     glyph: '𓏲' }, // Coiled rope
+  { value: 100,     glyph: '𓍢' }, // Coiled rope
   { value: 10,      glyph: '𓎆' }, // Hobble
-  { value: 1,       glyph: '𓏻' }, // Stroke
+  { value: 1,       glyph: '𓏺' }, // Stroke
 ];
 
 function toEgyptian(n) {
@@ -57,8 +57,9 @@ function evalExpression(expr) {
       .replace(/÷/g, '/')
       .replace(/×/g, '*')
       .replace(/−/g, '-');
-    // Safety: only allow digits, operators, dots, parens, spaces
-    if (/[^0-9+\-*/.() ]/.test(normalized)) return null;
+    // Safety: only allow digits, operators, dots, parens, spaces, and the
+    // exponent 'e' that formatNum emits for very large/small results
+    if (/[^0-9+\-*/.() e]/.test(normalized)) return null;
     const result = Function('"use strict"; return (' + normalized + ')')();
     return typeof result === 'number' ? result : null;
   } catch {
@@ -72,6 +73,9 @@ function appendNum(digit) {
     expression = '';
     justCalculated = false;
   }
+  // Replace a lone leading zero — strict mode rejects literals like "05"
+  const current = expression.split(/[÷×−+]/).pop();
+  if (current === '0' || current === '-0') expression = expression.slice(0, -1);
   expression += digit;
   updateDisplay();
 }
@@ -133,6 +137,16 @@ function calculate() {
   const result = evalExpression(expression);
   if (result === null) return;
 
+  // Infinity/NaN can't be computed on further — show it, then start fresh
+  if (!Number.isFinite(result)) {
+    expression = '';
+    resultEl.textContent = '';
+    exprEl.textContent = formatNum(result);
+    hierEl.textContent = '';
+    justCalculated = true;
+    return;
+  }
+
   const formatted = formatNum(result);
   expression = formatted;
   resultEl.textContent = '';
@@ -147,12 +161,14 @@ function calculate() {
 
 /* ── Keyboard support ── */
 document.addEventListener('keydown', e => {
+  // Leave browser shortcuts (Ctrl +/- zoom, etc.) alone
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.key >= '0' && e.key <= '9') appendNum(e.key);
   else if (e.key === '.') appendDecimal();
   else if (e.key === '+') appendOp('+');
   else if (e.key === '-') appendOp('−');
   else if (e.key === '*') appendOp('×');
-  else if (e.key === '/') { e.preventDefault(); appendOp('÷'); }
+  else if (e.key === '/') appendOp('÷');
   else if (e.key === 'Enter' || e.key === '=') calculate();
   else if (e.key === 'Backspace') {
     expression = expression.slice(0, -1);
@@ -161,6 +177,10 @@ document.addEventListener('keydown', e => {
   }
   else if (e.key === 'Escape') clearAll();
   else if (e.key === '%') percent();
+  else return;
+  // Handled: stop Enter from also clicking the last-focused button,
+  // and '/' from opening Firefox quick find
+  e.preventDefault();
 });
 
 /* ── Starfield ── */

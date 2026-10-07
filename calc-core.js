@@ -47,19 +47,66 @@ function formatNum(n) {
   return parseFloat(n.toPrecision(12)).toString();
 }
 
+// Numbers (including the 1e+21 / 1.5e-8 forms formatNum emits), operators
+// and parentheses. Returns null if anything else appears.
+function tokenize(src) {
+  const pattern = /((?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)|([-+*/()])/y;
+  const tokens = [];
+  while (pattern.lastIndex < src.length) {
+    const match = pattern.exec(src);
+    if (!match) return null;
+    tokens.push(match[1] !== undefined ? Number(match[1]) : match[2]);
+  }
+  return tokens;
+}
+
+// Recursive-descent evaluator, so typed input is never run as code:
+//   sum     = product (('+' | '-') product)*
+//   product = unary (('*' | '/') unary)*
+//   unary   = '-' unary | primary
+//   primary = number | '(' sum ')'
+// Returns null for empty or unfinished input like "5+" or "(2".
 function evalExpression(expr) {
   if (!expr) return null;
+  const tokens = tokenize(expr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-'));
+  if (!tokens) return null;
+  let pos = 0;
+
+  function sum() {
+    let value = product();
+    while (tokens[pos] === '+' || tokens[pos] === '-') {
+      const op = tokens[pos++];
+      const rhs = product();
+      value = op === '+' ? value + rhs : value - rhs;
+    }
+    return value;
+  }
+  function product() {
+    let value = unary();
+    while (tokens[pos] === '*' || tokens[pos] === '/') {
+      const op = tokens[pos++];
+      const rhs = unary();
+      value = op === '*' ? value * rhs : value / rhs;
+    }
+    return value;
+  }
+  function unary() {
+    if (tokens[pos] === '-') { pos++; return -unary(); }
+    return primary();
+  }
+  function primary() {
+    const token = tokens[pos++];
+    if (typeof token === 'number') return token;
+    if (token === '(') {
+      const value = sum();
+      if (tokens[pos++] === ')') return value;
+    }
+    throw new SyntaxError('Unexpected ' + (token ?? 'end of input'));
+  }
+
   try {
-    const normalized = expr
-      .replace(/÷/g, '/')
-      .replace(/×/g, '*')
-      // Spaces keep "5 − -3" from becoming the decrement operator "5--3"
-      .replace(/−/g, ' - ');
-    // Safety: only allow digits, operators, dots, parens, spaces, and the
-    // exponent 'e' that formatNum emits for very large/small results
-    if (/[^0-9+\-*/.() e]/.test(normalized)) return null;
-    const result = Function('"use strict"; return (' + normalized + ')')();
-    return typeof result === 'number' ? result : null;
+    const value = sum();
+    return pos === tokens.length ? value : null;
   } catch {
     return null;
   }

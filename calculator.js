@@ -21,6 +21,22 @@ function toEgyptian(n) {
   return result;
 }
 
+// Glyphs plus a short caveat when they can't show the number exactly:
+// the Egyptian system has no zero, no negatives, no decimals, and tops out
+// below ten million.
+function describeHieroglyph(n) {
+  if (!Number.isFinite(n)) return { glyphs: '', note: '' };
+  const rounded = Math.round(Math.abs(n));
+  if (rounded > 9999999) return { glyphs: '', note: 'too large for hieroglyphs' };
+  if (rounded === 0) {
+    return { glyphs: '', note: n === 0 ? 'no hieroglyph for zero' : 'rounds to 0 — no hieroglyph for zero' };
+  }
+  const notes = [];
+  if (n < 0) notes.push('negative');
+  if (!Number.isInteger(n)) notes.push('≈ rounded');
+  return { glyphs: toEgyptian(rounded), note: notes.join(' · ') };
+}
+
 /* ── State ── */
 let expression = '';
 let justCalculated = false;
@@ -28,6 +44,15 @@ let justCalculated = false;
 const exprEl   = document.getElementById('expression');
 const resultEl = document.getElementById('result');
 const hierEl   = document.getElementById('hieroglyph-num');
+const noteEl   = document.getElementById('hieroglyph-note');
+
+const OPS = '÷×−+';
+
+function showHieroglyph(n) {
+  const { glyphs, note } = n === null ? { glyphs: '', note: '' } : describeHieroglyph(n);
+  hierEl.textContent = glyphs;
+  noteEl.textContent = note;
+}
 
 function updateDisplay() {
   exprEl.textContent = expression || '0';
@@ -36,11 +61,11 @@ function updateDisplay() {
   const preview = evalExpression(expression);
   if (preview !== null && expression !== String(preview)) {
     resultEl.textContent = '= ' + formatNum(preview);
-    hierEl.textContent = toEgyptian(Math.abs(Math.round(preview)));
+    showHieroglyph(preview);
   } else {
     resultEl.textContent = '';
     const solo = parseFloat(expression);
-    hierEl.textContent = Number.isFinite(solo) ? toEgyptian(Math.abs(Math.round(solo))) : '';
+    showHieroglyph(Number.isFinite(solo) ? solo : null);
   }
 }
 
@@ -56,7 +81,8 @@ function evalExpression(expr) {
     const normalized = expr
       .replace(/÷/g, '/')
       .replace(/×/g, '*')
-      .replace(/−/g, '-');
+      // Spaces keep "5 − -3" from becoming the decrement operator "5--3"
+      .replace(/−/g, ' - ');
     // Safety: only allow digits, operators, dots, parens, spaces, and the
     // exponent 'e' that formatNum emits for very large/small results
     if (/[^0-9+\-*/.() e]/.test(normalized)) return null;
@@ -82,26 +108,22 @@ function appendNum(digit) {
 
 function appendOp(op) {
   justCalculated = false;
-  if (!expression) {
-    if (op === '−') expression = '-';
+  // Minus at the start or straight after an operator negates the next number
+  if (op === '−' && (!expression || OPS.includes(expression.slice(-1)))) {
+    expression += '-';
     return updateDisplay();
   }
-  // Replace trailing operator
-  const last = expression.slice(-1);
-  if ('÷×−+'.includes(last)) {
-    expression = expression.slice(0, -1) + op;
-  } else {
-    expression += op;
-  }
+  // Drop a dangling negative sign and/or trailing operator, then add the new one
+  expression = expression.replace(/[÷×−+]?-$/, '').replace(/[÷×−+]$/, '');
+  if (expression) expression += op;
   updateDisplay();
 }
 
 function appendDecimal() {
-  if (justCalculated) { expression = '0'; justCalculated = false; }
-  if (!expression) { expression = '0'; }
+  if (justCalculated) { expression = ''; justCalculated = false; }
   // Only add dot if the current number segment doesn't already have one
-  const parts = expression.split(/[÷×−+]/);
-  const last = parts[parts.length - 1];
+  const last = expression.split(/[÷×−+]/).pop();
+  if (last === '' || last === '-') expression += '0';
   if (!last.includes('.')) expression += '.';
   updateDisplay();
 }
@@ -142,7 +164,7 @@ function calculate() {
     expression = '';
     resultEl.textContent = '';
     exprEl.textContent = formatNum(result);
-    hierEl.textContent = '';
+    showHieroglyph(null);
     justCalculated = true;
     return;
   }
@@ -151,7 +173,7 @@ function calculate() {
   expression = formatted;
   resultEl.textContent = '';
   exprEl.textContent = formatted;
-  hierEl.textContent = toEgyptian(Math.abs(Math.round(result)));
+  showHieroglyph(result);
   justCalculated = true;
 
   // Gold flash on equals
@@ -199,17 +221,6 @@ document.addEventListener('keydown', e => {
     container.appendChild(star);
   }
 })();
-
-/* ── Flash keyframe (injected) ── */
-const style = document.createElement('style');
-style.textContent = `
-  .flash { animation: gold-flash 0.3s ease-out; }
-  @keyframes gold-flash {
-    0%   { color: #f0c040; text-shadow: 0 0 30px #f0c040; }
-    100% { color: #a8d060; text-shadow: none; }
-  }
-`;
-document.head.appendChild(style);
 
 /* ── Initial render ── */
 updateDisplay();

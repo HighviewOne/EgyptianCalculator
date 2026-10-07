@@ -62,7 +62,7 @@ Numbers are converted to ancient Egyptian hieroglyphics in real time:
 | Hobble | 10 | 𓎆 |
 | Stroke | 1 | 𓏺 |
 
-> Numbers up to **9,999,999** are supported in hieroglyphic form.
+> Numbers up to **9,999,999** are supported in hieroglyphic form. The Egyptian system had no zero, negatives or decimals, so a short note under the glyphs flags when a result is negative, rounded, zero or too large.
 
 ---
 

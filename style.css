@@ -1,11 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap');
 
 /* ── Reset & base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Cinzel has no hieroglyphs, so glyphs fall through to Noto instead of
+   rendering as empty boxes on systems without a hieroglyph font */
+:root { --glyph-font: 'Noto Sans Egyptian Hieroglyphs'; }
+
 body {
   min-height: 100vh;
-  font-family: 'Cinzel', serif;
+  font-family: 'Cinzel', var(--glyph-font), serif;
   background: #0a0608;
   overflow-x: hidden;
 }
@@ -60,7 +64,7 @@ body {
   50%       { filter: drop-shadow(0 0 24px #f0c040cc); }
 }
 h1 {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Cinzel Decorative', var(--glyph-font), serif;
   font-size: clamp(1.1rem, 3vw, 2rem);
   color: #f0c040;
   letter-spacing: 0.12em;
@@ -170,12 +174,22 @@ h1 {
   pointer-events: none;
 }
 .display-hieroglyph {
+  font-family: var(--glyph-font), serif;
+  font-size: 1.4rem;
+  color: #a8d060;
+  text-shadow: 0 0 8px #6ab03044;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  min-height: 1.3em;
+  text-align: right;
+  word-break: break-all;
+}
+.display-hieroglyph-note {
   font-size: 0.7rem;
-  color: #4a7c2088;
-  letter-spacing: 0.2em;
+  color: #8fbf50;
+  letter-spacing: 0.05em;
   min-height: 1.2em;
   text-align: right;
-  transition: opacity 0.3s;
 }
 .display-expression {
   font-size: 1.6rem;
@@ -184,6 +198,11 @@ h1 {
   word-break: break-all;
   text-shadow: 0 0 8px #6ab03044;
   line-height: 1.3;
+}
+.display-expression.flash { animation: gold-flash 0.3s ease-out; }
+@keyframes gold-flash {
+  0%   { color: #f0c040; text-shadow: 0 0 30px #f0c040; }
+  100% { color: #a8d060; text-shadow: none; }
 }
 .display-result {
   font-size: 1rem;
@@ -203,7 +222,7 @@ h1 {
 
 /* ── Buttons ── */
 .btn {
-  font-family: 'Cinzel', serif;
+  font-family: 'Cinzel', var(--glyph-font), serif;
   font-size: 1.05rem;
   font-weight: 700;
   border: none;
@@ -222,6 +241,10 @@ h1 {
   inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
   pointer-events: none;
+}
+.btn:focus-visible {
+  outline: 2px solid #f0c040;
+  outline-offset: 2px;
 }
 .btn:active {
   transform: scale(0.94);
@@ -296,7 +319,7 @@ h1 {
   z-index: 1;
   text-align: center;
   padding: 1rem 1rem 2.5rem;
-  color: #7a5020;
+  color: #b08850;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
 }
@@ -309,9 +332,17 @@ h1 {
 
 /* ── Responsive ── */
 @media (max-width: 480px) {
-  .calculator { width: 300px; padding: 14px; }
+  /* Leave room for both pillars (2 × 28px) so nothing is clipped at 320px */
+  .calculator { width: min(300px, calc(100vw - 64px)); padding: 14px; }
   .pillar { width: 28px; }
   .pillar-body { width: 12px; }
   .btn { padding: 13px 4px; font-size: 0.9rem; }
   h1 { font-size: 1rem; }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .star, .eye-of-ra, .display-expression.flash { animation: none; }
+  .btn { transition: none; }
+  .btn:active { transform: none; }
 }

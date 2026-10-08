@@ -30,6 +30,6 @@ jobs:
           node-version: 22
           cache: npm
       - name: Install Playwright
-        run: npm ci && npx playwright install --with-deps chromium
+        run: npm ci && npx playwright install --with-deps chromium firefox webkit
       - name: Browser tests
         run: npx playwright test

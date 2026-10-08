@@ -4,13 +4,13 @@
 
 /* ── Egyptian numeral conversion ── */
 const EGYPTIAN_GLYPHS = [
-  { value: 1000000, glyph: '𓁨' }, // Astonished man
-  { value: 100000,  glyph: '𓆐' }, // Tadpole
-  { value: 10000,   glyph: '𓂭' }, // Pointing finger
-  { value: 1000,    glyph: '𓆼' }, // Lotus
-  { value: 100,     glyph: '𓍢' }, // Coiled rope
-  { value: 10,      glyph: '𓎆' }, // Hobble
-  { value: 1,       glyph: '𓏺' }, // Stroke
+  { value: 1000000, glyph: '𓁨', name: 'astonished man' },
+  { value: 100000,  glyph: '𓆐', name: 'tadpole' },
+  { value: 10000,   glyph: '𓂭', name: 'pointing finger' },
+  { value: 1000,    glyph: '𓆼', name: 'lotus flower' },
+  { value: 100,     glyph: '𓍢', name: 'coiled rope' },
+  { value: 10,      glyph: '𓎆', name: 'hobble' },
+  { value: 1,       glyph: '𓏺', name: 'stroke' },
 ];
 
 function toEgyptian(n) {
@@ -101,6 +101,45 @@ function describeFraction(n) {
     glyphs: glyphs.filter(Boolean).join(' '),
     note: (n < 0 ? 'negative · ' : '') + terms.join(' + '),
   };
+}
+
+/* ── Explaining the glyphs ── */
+const formatCount = n => n.toLocaleString('en-US');
+
+// Splits a glyph line from describeHieroglyph into labelled pieces for the
+// hover/tap explanations, plus a reading of the whole line for screen
+// readers. Whole numbers are labelled sign by sign; a unit fraction such
+// as 𓂋𓏺𓏺𓏺 (1/3) is one piece, as is the 2/3 sign.
+//   readGlyphs('𓆼𓍢𓍢') → {
+//     parts: [{ text: '𓆼', label: 'lotus flower · 1,000' }, …],
+//     reading: '1 × lotus flower (1,000), 2 × coiled rope (100)' }
+// Spaces between terms come back as unlabelled { text: ' ' } parts.
+function readGlyphs(glyphs) {
+  const parts = [];
+  const reading = [];
+  const terms = glyphs.split(' ').filter(Boolean);
+  terms.forEach((term, i) => {
+    if (i) parts.push({ text: ' ' });
+    if (term === TWO_THIRDS) {
+      parts.push({ text: term, label: '2/3' });
+      reading.push('2/3');
+    } else if (term.startsWith(FRACTION_MARK)) {
+      const den = [...term.slice(FRACTION_MARK.length)]
+        .reduce((sum, g) => sum + EGYPTIAN_GLYPHS.find(e => e.glyph === g).value, 0);
+      parts.push({ text: term, label: '1/' + den });
+      reading.push('1/' + den);
+    } else {
+      for (const { value, glyph, name } of EGYPTIAN_GLYPHS) {
+        const count = [...term].filter(g => g === glyph).length;
+        if (!count) continue;
+        for (let k = 0; k < count; k++) {
+          parts.push({ text: glyph, label: `${name} · ${formatCount(value)}` });
+        }
+        reading.push(`${count} × ${name} (${formatCount(value)})`);
+      }
+    }
+  });
+  return { parts, reading: reading.join(', ') };
 }
 
 // Glyphs plus a short caveat when they can't show the number exactly:
@@ -248,7 +287,8 @@ function withPercent(expr) {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    toEgyptian, toFraction, unitFractions, describeHieroglyph, formatNum, evalExpression,
+    toEgyptian, toFraction, unitFractions, describeHieroglyph, readGlyphs,
+    formatNum, evalExpression,
     withDigit, withOp, withDecimal, withPercent,
   };
 }

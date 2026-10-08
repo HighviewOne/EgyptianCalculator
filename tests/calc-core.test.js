@@ -2,7 +2,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  toEgyptian, toFraction, unitFractions, describeHieroglyph, formatNum, evalExpression,
+  toEgyptian, toFraction, unitFractions, describeHieroglyph, readGlyphs,
+  formatNum, evalExpression,
   withDigit, withOp, withDecimal, withPercent,
 } = require('../calc-core.js');
 
@@ -229,4 +230,34 @@ test('fraction mode falls back to rounding when no simple fraction fits', () => 
   assert.deepEqual(describeHieroglyph(Math.PI, opts), { glyphs: '𓏺𓏺𓏺', note: '≈ rounded (no simple fraction)' });
   assert.deepEqual(describeHieroglyph(5 / 121, opts), { glyphs: '', note: 'rounds to 0 (no simple fraction)' });
   assert.deepEqual(describeHieroglyph(12000000.5, opts), { glyphs: '', note: 'too large for hieroglyphs' });
+});
+
+test('readGlyphs labels each sign and reads the whole number', () => {
+  const { parts, reading } = readGlyphs(toEgyptian(1204));
+  assert.deepEqual(parts.map(p => p.label), [
+    'lotus flower · 1,000', 'coiled rope · 100', 'coiled rope · 100',
+    'stroke · 1', 'stroke · 1', 'stroke · 1', 'stroke · 1',
+  ]);
+  assert.equal(parts.map(p => p.text).join(''), toEgyptian(1204));
+  assert.equal(reading, '1 × lotus flower (1,000), 2 × coiled rope (100), 4 × stroke (1)');
+  assert.equal(readGlyphs('𓁨').reading, '1 × astonished man (1,000,000)');
+});
+
+test('readGlyphs treats each fraction as one piece', () => {
+  const { glyphs } = describeHieroglyph(1 + 5 / 6, { fractions: true });
+  const { parts, reading } = readGlyphs(glyphs);
+  assert.deepEqual(parts, [
+    { text: '𓏺', label: 'stroke · 1' },
+    { text: ' ' },
+    { text: '𓂌', label: '2/3' },
+    { text: ' ' },
+    { text: '𓂋𓏺𓏺𓏺𓏺𓏺𓏺', label: '1/6' },
+  ]);
+  assert.equal(parts.map(p => p.text).join(''), glyphs);
+  assert.equal(reading, '1 × stroke (1), 2/3, 1/6');
+  assert.equal(readGlyphs(toEgyptian(1000).replace(/^/, '𓂋')).reading, '1/1000');
+});
+
+test('readGlyphs of an empty line is empty', () => {
+  assert.deepEqual(readGlyphs(''), { parts: [], reading: '' });
 });

@@ -11,58 +11,59 @@
     <div class="stars" id="stars"></div>
 
     <header class="temple-header">
-      <div class="eye-of-ra">𓂀</div>
-      <h1>𓂀 Calculator of the Pharaohs 𓂀</h1>
-      <div class="hieroglyph-strip">𓀀 𓁿 𓂋 𓆣 𓇋 𓈖 𓉐 𓊪 𓋹 𓌀 𓍿 𓎛 𓏏 𓐍</div>
+      <div class="eye-of-ra" aria-hidden="true">𓂀</div>
+      <h1><span aria-hidden="true">𓂀 </span>Calculator of the Pharaohs<span aria-hidden="true"> 𓂀</span></h1>
+      <div class="hieroglyph-strip" aria-hidden="true">𓀀 𓁿 𓂋 𓆣 𓇋 𓈖 𓉐 𓊪 𓋹 𓌀 𓍿 𓎛 𓏏 𓐍</div>
     </header>
 
     <div class="calculator-wrapper">
-      <div class="pillar left-pillar">
+      <div class="pillar left-pillar" aria-hidden="true">
         <div class="cartouche">𓏞</div>
         <div class="pillar-body"></div>
         <div class="cartouche">𓏜</div>
       </div>
 
       <div class="calculator">
-        <div class="display-area">
+        <div class="display-area" role="status" aria-live="polite">
           <div class="display-expression" id="expression">0</div>
           <div class="display-result" id="result"></div>
-          <div class="display-hieroglyph" id="hieroglyph-num"></div>
+          <div class="display-hieroglyph" id="hieroglyph-num" aria-hidden="true"></div>
+          <div class="display-hieroglyph-note" id="hieroglyph-note"></div>
         </div>
 
         <div class="button-grid">
           <!-- Row 1 -->
-          <button class="btn btn-fn" onclick="clearAll()">AC</button>
-          <button class="btn btn-fn" onclick="toggleSign()">+/−</button>
-          <button class="btn btn-fn" onclick="percent()">%</button>
-          <button class="btn btn-op" onclick="appendOp('÷')">𓌀 ÷</button>
+          <button class="btn btn-fn" onclick="clearAll()" aria-label="All clear">AC</button>
+          <button class="btn btn-fn" onclick="toggleSign()" aria-label="Toggle sign">+/−</button>
+          <button class="btn btn-fn" onclick="percent()" aria-label="Percent">%</button>
+          <button class="btn btn-op" onclick="appendOp('÷')" aria-label="Divide">𓌀 ÷</button>
 
           <!-- Row 2 -->
           <button class="btn btn-num" onclick="appendNum('7')">7</button>
           <button class="btn btn-num" onclick="appendNum('8')">8</button>
           <button class="btn btn-num" onclick="appendNum('9')">9</button>
-          <button class="btn btn-op" onclick="appendOp('×')">× 𓆣</button>
+          <button class="btn btn-op" onclick="appendOp('×')" aria-label="Multiply">× 𓆣</button>
 
           <!-- Row 3 -->
           <button class="btn btn-num" onclick="appendNum('4')">4</button>
           <button class="btn btn-num" onclick="appendNum('5')">5</button>
           <button class="btn btn-num" onclick="appendNum('6')">6</button>
-          <button class="btn btn-op" onclick="appendOp('−')">− 𓏏</button>
+          <button class="btn btn-op" onclick="appendOp('−')" aria-label="Subtract">− 𓏏</button>
 
           <!-- Row 4 -->
           <button class="btn btn-num" onclick="appendNum('1')">1</button>
           <button class="btn btn-num" onclick="appendNum('2')">2</button>
           <button class="btn btn-num" onclick="appendNum('3')">3</button>
-          <button class="btn btn-op" onclick="appendOp('+')">𓇋 +</button>
+          <button class="btn btn-op" onclick="appendOp('+')" aria-label="Add">𓇋 +</button>
 
           <!-- Row 5 -->
           <button class="btn btn-num btn-zero" onclick="appendNum('0')">0</button>
-          <button class="btn btn-num" onclick="appendDecimal()">.</button>
-          <button class="btn btn-equals" onclick="calculate()">𓋹 =</button>
+          <button class="btn btn-num" onclick="appendDecimal()" aria-label="Decimal point">.</button>
+          <button class="btn btn-equals" onclick="calculate()" aria-label="Equals">𓋹 =</button>
         </div>
       </div>
 
-      <div class="pillar right-pillar">
+      <div class="pillar right-pillar" aria-hidden="true">
         <div class="cartouche">𓏞</div>
         <div class="pillar-body"></div>
         <div class="cartouche">𓏜</div>
@@ -70,9 +71,9 @@
     </div>
 
     <footer class="temple-footer">
-      <div class="scarab">𓆣</div>
+      <div class="scarab" aria-hidden="true">𓆣</div>
       <p>Built in the age of Pharaohs &bull; Numbers preserved on papyrus</p>
-      <div class="hieroglyph-strip">𓐍 𓏏 𓎛 𓍿 𓌀 𓋹 𓊪 𓉐 𓈖 𓇋 𓆣 𓂋 𓁿 𓀀</div>
+      <div class="hieroglyph-strip" aria-hidden="true">𓐍 𓏏 𓎛 𓍿 𓌀 𓋹 𓊪 𓉐 𓈖 𓇋 𓆣 𓂋 𓁿 𓀀</div>
     </footer>
   </div>
 

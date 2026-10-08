@@ -35,6 +35,7 @@
 | 𓂀 **Egyptian Aesthetic** | Dark starfield sky, gold/bronze palette, temple pillars, Eye of Ra |
 | 𓏏 **Hieroglyphic Numerals** | Results displayed in authentic ancient Egyptian number glyphs |
 | 𓆣 **Full Calculator** | Addition, subtraction, multiplication, division, %, sign toggle, decimals |
+| 𓆼 **Read the Glyphs** | Hover or tap any hieroglyph to see what it's worth (𓆼 lotus flower · 1,000) |
 | 𓂋 **Unit Fractions** | Optional Egyptian-style fractions: 2/7 = 1/4 + 1/28, with the special 2/3 sign 𓂌 |
 | 𓋹 **Live Preview** | Answer appears as you type — no need to hit equals first |
 | 𓌀 **Keyboard Support** | Numbers, operators, Enter, Backspace, Escape all work |
@@ -51,7 +52,7 @@
 
 ## 𓎛 Egyptian Numeral System
 
-Numbers are converted to ancient Egyptian hieroglyphics in real time:
+Numbers are converted to ancient Egyptian hieroglyphics in real time. Hover over or tap any glyph in the answer to see its name and value; with the keyboard, Tab to the glyph line to hear or see the whole reading.
 
 | Symbol | Value | Hieroglyph |
 |--------|-------|-----------|

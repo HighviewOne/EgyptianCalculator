@@ -182,6 +182,31 @@ h1 {
   text-align: right;
   word-break: break-all;
 }
+.display-hieroglyph .glyph {
+  cursor: help;
+  border-radius: 3px;
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+.display-hieroglyph .glyph:hover,
+.display-hieroglyph .glyph.active {
+  color: #f0c040;
+  background-color: #f0c04022;
+}
+.display-hieroglyph:focus-visible {
+  outline: 2px solid #f0c040;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* The glyph explanation sits in the same spot as the note it replaces */
+.note-row { display: grid; }
+.note-row > * { grid-area: 1 / 1; }
+.display-area.explaining .display-hieroglyph-note { visibility: hidden; }
+.glyph-info {
+  font-size: 0.75rem;
+  color: #f0c040;
+  letter-spacing: 0.05em;
+  text-align: right;
+}
 .display-hieroglyph-note {
   font-size: 0.7rem;
   color: #8fbf50;

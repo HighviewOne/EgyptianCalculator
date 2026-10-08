@@ -42,11 +42,18 @@
       </div>
 
       <div class="calculator">
-        <div class="display-area" role="status" aria-live="polite">
-          <div class="display-expression" id="expression">0</div>
-          <div class="display-result" id="result"></div>
-          <div class="display-hieroglyph" id="hieroglyph-num" aria-hidden="true"></div>
-          <div class="display-hieroglyph-note" id="hieroglyph-note"></div>
+        <div class="display-area" id="display">
+          <div role="status">
+            <div class="display-expression" id="expression">0</div>
+            <div class="display-result" id="result"></div>
+          </div>
+          <!-- Hover, tap or focus a glyph to see what it's worth; the line's
+               spoken name is a full reading, set by calculator.js -->
+          <div class="display-hieroglyph" id="hieroglyph-num"></div>
+          <div class="note-row">
+            <div class="display-hieroglyph-note" id="hieroglyph-note" aria-live="polite"></div>
+            <div class="glyph-info" id="glyph-info" aria-hidden="true"></div>
+          </div>
         </div>
 
         <div class="mode-row">

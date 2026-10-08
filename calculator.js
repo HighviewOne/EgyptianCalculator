@@ -6,6 +6,8 @@ const exprEl   = document.getElementById('expression');
 const resultEl = document.getElementById('result');
 const hierEl   = document.getElementById('hieroglyph-num');
 const noteEl   = document.getElementById('hieroglyph-note');
+const infoEl   = document.getElementById('glyph-info');
+const displayEl = document.getElementById('display');
 
 const fractionToggle = document.getElementById('fraction-toggle');
 
@@ -21,9 +23,71 @@ function showHieroglyph(n) {
   const { glyphs, note } = n === null
     ? { glyphs: '', note: '' }
     : describeHieroglyph(n, { fractions: showFractions });
-  hierEl.textContent = glyphs;
+  renderGlyphs(glyphs);
   noteEl.textContent = note;
 }
+
+/* ── Glyph explanations ── */
+let activeGlyph = null;
+
+// One span per labelled piece; the line becomes a single Tab stop whose
+// spoken name reads the whole number out
+function renderGlyphs(glyphs) {
+  const { parts, reading } = readGlyphs(glyphs);
+  hierEl.replaceChildren(...parts.map(({ text, label }) => {
+    if (!label) return document.createTextNode(text);
+    const span = document.createElement('span');
+    span.className = 'glyph';
+    span.textContent = text;
+    span.dataset.label = label;
+    return span;
+  }));
+  if (reading) {
+    hierEl.tabIndex = 0;
+    hierEl.setAttribute('role', 'img');
+    hierEl.setAttribute('aria-label', reading);
+  } else {
+    hierEl.removeAttribute('tabindex');
+    hierEl.removeAttribute('role');
+    hierEl.removeAttribute('aria-label');
+  }
+  // Keep a keyboard user's reading up to date as they type
+  explain(reading && hierEl.matches(':focus-visible') ? reading : '');
+}
+
+// Shows text in place of the note, highlighting the glyph it describes
+function explain(text, glyph = null) {
+  activeGlyph?.classList.remove('active');
+  activeGlyph = glyph;
+  glyph?.classList.add('active');
+  infoEl.textContent = text;
+  displayEl.classList.toggle('explaining', Boolean(text));
+}
+
+const explainGlyph = glyph => explain(`${glyph.textContent} ${glyph.dataset.label}`, glyph);
+
+// Mouse: follow the pointer. Touch: a tap shows the label until the next
+// tap elsewhere (touch pointers "leave" as soon as the finger lifts).
+hierEl.addEventListener('pointerover', e => {
+  const glyph = e.target.closest('.glyph');
+  if (glyph && e.pointerType === 'mouse') explainGlyph(glyph);
+});
+hierEl.addEventListener('pointerleave', e => {
+  if (e.pointerType === 'mouse') explain('');
+});
+hierEl.addEventListener('click', e => {
+  const glyph = e.target.closest('.glyph');
+  if (glyph) explainGlyph(glyph);
+});
+document.addEventListener('click', e => {
+  if (!hierEl.contains(e.target)) explain('');
+});
+// Keyboard focus shows the whole reading (a mouse click focuses too, but
+// isn't :focus-visible)
+hierEl.addEventListener('focus', () => {
+  if (hierEl.matches(':focus-visible')) explain(hierEl.getAttribute('aria-label') || '');
+});
+hierEl.addEventListener('blur', () => explain(''));
 
 function updateDisplay() {
   exprEl.textContent = expression || '0';

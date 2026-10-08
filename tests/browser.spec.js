@@ -93,6 +93,50 @@ test('unit-fraction toggle uses the 2/3 sign and is remembered', async ({ page }
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
 });
 
+test('hovering or tapping a glyph shows what it is worth', async ({ page }) => {
+  const info = page.locator('#glyph-info');
+  await page.keyboard.type('1204');
+  await expect(note(page)).toBeVisible();
+  const signs = glyphs(page).locator('.glyph');
+  await expect(signs).toHaveCount(7);
+
+  await signs.first().hover();
+  await expect(info).toHaveText('𓆼 lotus flower · 1,000');
+  await expect(note(page)).toBeHidden();
+  await expect(signs.first()).toHaveClass(/active/);
+
+  await signs.nth(1).click();
+  await expect(info).toHaveText('𓍢 coiled rope · 100');
+
+  // Clicking elsewhere, or moving the mouse away, puts the note back
+  await page.locator('.temple-header').click();
+  await expect(info).toHaveText('');
+  await expect(note(page)).toBeVisible();
+});
+
+test('fractions are explained as a whole', async ({ page }) => {
+  await page.getByRole('button', { name: 'Unit fractions' }).click();
+  await page.keyboard.type('1+5/6');
+  const signs = glyphs(page).locator('.glyph');
+  await signs.nth(1).click();
+  await expect(page.locator('#glyph-info')).toHaveText('𓂌 2/3');
+  await signs.nth(2).click();
+  await expect(page.locator('#glyph-info')).toHaveText('𓂋𓏺𓏺𓏺𓏺𓏺𓏺 1/6');
+});
+
+test('the glyph line has a spoken reading and shows it on keyboard focus', async ({ page }) => {
+  const line = page.getByRole('img', { name: '1 × lotus flower (1,000), 2 × coiled rope (100), 4 × stroke (1)' });
+  await page.keyboard.type('1204');
+  await expect(line).toBeVisible();
+  await line.focus();
+  await expect(page.locator('#glyph-info')).toHaveText(
+    '1 × lotus flower (1,000), 2 × coiled rope (100), 4 × stroke (1)');
+  // With no glyphs the line drops out of the Tab order
+  await page.keyboard.press('Escape');
+  await expect(glyphs(page)).not.toHaveAttribute('tabindex');
+  await expect(glyphs(page)).not.toHaveAttribute('role');
+});
+
 test('hieroglyphs render in the hieroglyph web font', async ({ page }) => {
   // The font only downloads if the page's CSS actually uses it for glyphs
   await page.keyboard.type('12');

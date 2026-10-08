@@ -7,8 +7,20 @@ const resultEl = document.getElementById('result');
 const hierEl   = document.getElementById('hieroglyph-num');
 const noteEl   = document.getElementById('hieroglyph-note');
 
+const fractionToggle = document.getElementById('fraction-toggle');
+
+// Unit-fraction mode, remembered per browser when storage is available
+let showFractions = false;
+try { showFractions = localStorage.getItem('unitFractions') === 'on'; } catch {}
+fractionToggle.setAttribute('aria-pressed', showFractions);
+
+let hieroglyphValue = null;
+
 function showHieroglyph(n) {
-  const { glyphs, note } = n === null ? { glyphs: '', note: '' } : describeHieroglyph(n);
+  hieroglyphValue = n;
+  const { glyphs, note } = n === null
+    ? { glyphs: '', note: '' }
+    : describeHieroglyph(n, { fractions: showFractions });
   hierEl.textContent = glyphs;
   noteEl.textContent = note;
 }
@@ -99,6 +111,13 @@ function calculate() {
   setTimeout(() => exprEl.classList.remove('flash'), 300);
 }
 
+function toggleFractions() {
+  showFractions = !showFractions;
+  fractionToggle.setAttribute('aria-pressed', showFractions);
+  try { localStorage.setItem('unitFractions', showFractions ? 'on' : 'off'); } catch {}
+  showHieroglyph(hieroglyphValue);
+}
+
 /* ── Keyboard support ── */
 document.addEventListener('keydown', e => {
   // Leave browser shortcuts (Ctrl +/- zoom, etc.) alone
@@ -117,6 +136,7 @@ document.addEventListener('keydown', e => {
   }
   else if (e.key === 'Escape') clearAll();
   else if (e.key === '%') percent();
+  else if (e.key === 'f' || e.key === 'F') toggleFractions();
   else return;
   // Handled: stop Enter from also clicking the last-focused button,
   // and '/' from opening Firefox quick find

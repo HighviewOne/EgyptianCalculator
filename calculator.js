@@ -92,8 +92,8 @@ hierEl.addEventListener('blur', () => explain(''));
 function updateDisplay() {
   exprEl.textContent = expression || '0';
 
-  // Live preview while typing
-  const preview = evalExpression(expression);
+  // Live preview while typing, with any open brackets closed
+  const preview = evalExpression(withClosedParens(expression));
   if (preview !== null && expression !== String(preview)) {
     resultEl.textContent = '= ' + formatNum(preview);
     showHieroglyph(preview);
@@ -132,9 +132,27 @@ function clearAll() {
   updateDisplay();
 }
 
+function appendOpenParen() {
+  if (justCalculated) { expression = ''; justCalculated = false; }
+  expression = withOpenParen(expression);
+  updateDisplay();
+}
+
+function appendCloseParen() {
+  justCalculated = false;
+  expression = withCloseParen(expression);
+  updateDisplay();
+}
+
+function backspace() {
+  expression = expression.slice(0, -1);
+  justCalculated = false;
+  updateDisplay();
+}
+
 function toggleSign() {
   if (!expression) return;
-  const val = evalExpression(expression);
+  const val = evalExpression(withClosedParens(expression));
   if (val !== null) {
     expression = formatNum(-val);
     justCalculated = false;
@@ -150,7 +168,7 @@ function percent() {
 
 function calculate() {
   if (!expression) return;
-  const result = evalExpression(expression);
+  const result = evalExpression(withClosedParens(expression));
   if (result === null) return;
 
   // Infinity/NaN can't be computed on further — show it, then start fresh
@@ -193,6 +211,9 @@ const ACTIONS = {
   percent,
   decimal: appendDecimal,
   equals: calculate,
+  open: appendOpenParen,
+  close: appendCloseParen,
+  backspace,
   fractions: toggleFractions,
 };
 
@@ -216,11 +237,9 @@ document.addEventListener('keydown', e => {
   else if (e.key === '*') appendOp('×');
   else if (e.key === '/') appendOp('÷');
   else if (e.key === 'Enter' || e.key === '=') calculate();
-  else if (e.key === 'Backspace') {
-    expression = expression.slice(0, -1);
-    justCalculated = false;
-    updateDisplay();
-  }
+  else if (e.key === 'Backspace') backspace();
+  else if (e.key === '(') appendOpenParen();
+  else if (e.key === ')') appendCloseParen();
   else if (e.key === 'Escape' || e.key === 'Delete' || e.key === 'c' || e.key === 'C') clearAll();
   else if (e.key === '%') percent();
   else if (e.key === 'f' || e.key === 'F') toggleFractions();

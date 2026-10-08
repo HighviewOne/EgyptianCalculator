@@ -244,41 +244,86 @@ function lastNumber(expr) {
   return match ? match[0] : '';
 }
 
+// How many "(" are still waiting for a ")"
+function openParens(expr) {
+  let open = 0;
+  for (const ch of expr) {
+    if (ch === '(') open++;
+    else if (ch === ')') open--;
+  }
+  return open;
+}
+
+// The expression with any unclosed brackets closed, as a phone calculator
+// does for its preview and on "=": "(2+3" → "(2+3)"
+function withClosedParens(expr) {
+  return expr + ')'.repeat(Math.max(0, openParens(expr)));
+}
+
+// A number or "(" straight after a number or ")" means multiply: 2( → 2×(
+const timesIfNeeded = expr => /[\d.)]$/.test(expr) ? expr + '×' : expr;
+
+function withOpenParen(expr) {
+  return timesIfNeeded(expr) + '(';
+}
+
+function withCloseParen(expr) {
+  // Only close a bracket that's open, and only after a number or ")"
+  return openParens(expr) > 0 && /[\d.)]$/.test(expr) ? expr + ')' : expr;
+}
+
 function withDigit(expr, digit) {
   // A result like 1e-8 is complete; more digits would land in the exponent
   if (lastNumber(expr).includes('e')) return expr;
+  if (expr.endsWith(')')) expr += '×';
   // Replace a lone leading zero so "0" then "7" reads 7, not 07
-  const current = expr.split(/[÷×−+]/).pop();
+  const current = expr.split(/[÷×−+(]/).pop();
   if (current === '0' || current === '-0') expr = expr.slice(0, -1);
   return expr + digit;
 }
 
 function withOp(expr, op) {
-  // Minus at the start or straight after an operator negates the next number
-  if (op === '−' && (!expr || OPS.includes(expr.slice(-1)))) return expr + '-';
-  // Drop a dangling negative sign and/or trailing operator, then add the new one
+  // Minus at the start, or straight after an operator or "(", negates the
+  // next number
+  const last = expr.slice(-1);
+  if (op === '−' && (!expr || OPS.includes(last) || last === '(')) return expr + '-';
+  // Drop a dangling negative sign and/or trailing operator, then add the new
+  // one (an operator can't follow "(" directly)
   expr = expr.replace(/[÷×−+]?-$/, '').replace(/[÷×−+]$/, '');
-  return expr ? expr + op : expr;
+  return expr && !expr.endsWith('(') ? expr + op : expr;
 }
 
 function withDecimal(expr) {
   if (lastNumber(expr).includes('e')) return expr;
+  if (expr.endsWith(')')) expr += '×';
   // Only add dot if the current number segment doesn't already have one
-  const last = expr.split(/[÷×−+]/).pop();
+  const last = expr.split(/[÷×−+(]/).pop();
   if (last === '' || last === '-') expr += '0';
   return last.includes('.') ? expr : expr + '.';
 }
 
+// The part of the expression inside the innermost bracket that's still
+// open, or all of it if none is: "2×(50+10" → "50+10"
+function openGroup(expr) {
+  let depth = 0;
+  for (let i = expr.length - 1; i >= 0; i--) {
+    if (expr[i] === ')') depth++;
+    else if (expr[i] === '(' && depth-- === 0) return expr.slice(i + 1);
+  }
+  return expr;
+}
+
 // Works like a phone calculator: after + or − it takes that percent of
-// everything before it (50+10% → 50+5); otherwise it divides the last
-// number by 100 (50×10% → 50×0.1, 10% → 0.1)
+// what comes before it in the same bracket (50+10% → 50+5,
+// 2×(50+10% → 2×(50+5); otherwise it divides the last number by 100
+// (50×10% → 50×0.1, 10% → 0.1)
 function withPercent(expr) {
   const num = lastNumber(expr);
   if (!num) return expr;
   const head = expr.slice(0, -num.length);
   let value = Number(num) / 100;
   if (head.endsWith('+') || head.endsWith('−')) {
-    const base = evalExpression(head.slice(0, -1));
+    const base = evalExpression(openGroup(head.slice(0, -1)));
     if (base === null) return expr;
     value *= base;
   }
@@ -290,5 +335,6 @@ if (typeof module !== 'undefined') {
     toEgyptian, toFraction, unitFractions, describeHieroglyph, readGlyphs,
     formatNum, evalExpression,
     withDigit, withOp, withDecimal, withPercent,
+    withOpenParen, withCloseParen, withClosedParens,
   };
 }

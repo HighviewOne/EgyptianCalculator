@@ -22,7 +22,7 @@
 
 <br />
 
-<img src="screenshot.jpg" alt="Egyptian Calculator showing 1234+567 = 1801 with the answer in hieroglyphs" width="480" />
+<img src="screenshot.jpg" alt="Egyptian Calculator showing (1200+34)×2 = 2468 with the answer in hieroglyphs" width="480" />
 
 </div>
 
@@ -34,7 +34,7 @@
 |---|---|
 | 𓂀 **Egyptian Aesthetic** | Dark starfield sky, gold/bronze palette, temple pillars, Eye of Ra |
 | 𓏏 **Hieroglyphic Numerals** | Results displayed in authentic ancient Egyptian number glyphs |
-| 𓆣 **Full Calculator** | Addition, subtraction, multiplication, division, %, sign toggle, decimals |
+| 𓆣 **Full Calculator** | Addition, subtraction, multiplication, division, brackets, %, sign toggle, decimals, backspace |
 | 𓆼 **Read the Glyphs** | Hover or tap any hieroglyph to see what it's worth (𓆼 lotus flower · 1,000) |
 | 𓂋 **Unit Fractions** | Optional Egyptian-style fractions: 2/7 = 1/4 + 1/28, with the special 2/3 sign 𓂌 |
 | 𓋹 **Live Preview** | Answer appears as you type — no need to hit equals first |
@@ -119,12 +119,15 @@ Both run automatically on every pull request. The browser tests serve the page w
 | `+ - * /` | Operators |
 | `.` | Decimal point |
 | `Enter` or `=` | Calculate |
+| `(` `)` | Brackets |
 | `Backspace` | Delete last character |
 | `Escape`, `Delete` or `C` | Clear all |
 | `%` | Percent |
 | `F` | Toggle unit fractions |
 
-`%` works like a phone calculator: after `+` or `−` it takes that percent of what comes before (`50 + 10 %` → `50 + 5` = 55); otherwise it divides the last number by 100 (`50 × 10 %` → `50 × 0.1` = 5).
+Brackets work like a phone calculator's: an unclosed bracket is closed for you in the preview and on `=` (`(2+3` → 5), and a number or bracket straight after another means multiply (`2(3+4)` → `2×(3+4)`).
+
+`%` works like a phone calculator: after `+` or `−` it takes that percent of what comes before (`50 + 10 %` → `50 + 5` = 55); otherwise it divides the last number by 100 (`50 × 10 %` → `50 × 0.1` = 5). Inside brackets, the percent is of what comes before it in the same bracket.
 
 ---
 

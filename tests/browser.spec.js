@@ -43,6 +43,26 @@ test('every function button works', async ({ page }) => {
   await expect(display(page)).toHaveText('1.5');
 });
 
+test('bracket and backspace buttons', async ({ page }) => {
+  await press(page, 'Open bracket', '2', 'Add', '3');
+  // An open bracket is closed for the preview
+  await expect(display(page)).toHaveText('(2+3');
+  await expect(preview(page)).toHaveText('= 5');
+  await press(page, 'Close bracket', '4');
+  await expect(display(page)).toHaveText('(2+3)×4');
+  await press(page, 'Backspace');
+  await expect(display(page)).toHaveText('(2+3)×');
+  await press(page, 'Open bracket', '1', 'Add', '1', 'Equals');
+  await expect(display(page)).toHaveText('10');
+});
+
+test('brackets from the keyboard', async ({ page }) => {
+  await page.keyboard.type('2(3+4');
+  await expect(display(page)).toHaveText('2×(3+4');
+  await page.keyboard.press('Enter');
+  await expect(display(page)).toHaveText('14');
+});
+
 test('keyboard input, including negative operands', async ({ page }) => {
   await page.keyboard.type('5*-3');
   await page.keyboard.press('Enter');
@@ -148,7 +168,8 @@ test('hieroglyphs render in the hieroglyph web font', async ({ page }) => {
 test('every button has an accessible name', async ({ page }) => {
   // The names a screen reader announces, so decorative glyphs must not leak in
   const expected = [
-    'Unit fractions', 'All clear', 'Toggle sign', 'Percent', 'Divide',
+    'Unit fractions', 'Open bracket', 'Close bracket', 'Backspace',
+    'All clear', 'Toggle sign', 'Percent', 'Divide',
     '7', '8', '9', 'Multiply', '4', '5', '6', 'Subtract',
     '1', '2', '3', 'Add', '0', 'Decimal point', 'Equals',
   ];

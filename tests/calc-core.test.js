@@ -202,13 +202,26 @@ test('unitFractions gives up on splits that are too long or too large', () => {
 
 test('fraction mode writes the fractional part as unit fractions', () => {
   const opts = { fractions: true };
-  assert.deepEqual(describeHieroglyph(0.75, opts), { glyphs: '𓂋𓏺𓏺 𓂋𓏺𓏺𓏺𓏺', note: '1/2 + 1/4' });
-  assert.deepEqual(describeHieroglyph(1234.75, opts),
-    { glyphs: '𓆼𓍢𓍢𓎆𓎆𓎆𓏺𓏺𓏺𓏺 𓂋𓏺𓏺 𓂋𓏺𓏺𓏺𓏺', note: '1234 + 1/2 + 1/4' });
+  assert.deepEqual(describeHieroglyph(0.5, opts), { glyphs: '𓂋𓏺𓏺', note: '1/2' });
+  assert.deepEqual(describeHieroglyph(0.6, opts), { glyphs: '𓂋𓏺𓏺 𓂋𓎆', note: '1/2 + 1/10' });
+  assert.deepEqual(describeHieroglyph(1234.5, opts),
+    { glyphs: '𓆼𓍢𓍢𓎆𓎆𓎆𓏺𓏺𓏺𓏺 𓂋𓏺𓏺', note: '1234 + 1/2' });
   assert.deepEqual(describeHieroglyph(-2.5, opts), { glyphs: '𓏺𓏺 𓂋𓏺𓏺', note: 'negative · 2 + 1/2' });
   assert.deepEqual(describeHieroglyph(0.001, opts), { glyphs: '𓂋𓆼', note: '1/1000' });
   // Whole numbers are unchanged
   assert.deepEqual(describeHieroglyph(5, opts), describeHieroglyph(5));
+});
+
+test('fraction mode uses the 2/3 sign for fractions of 2/3 and above', () => {
+  const opts = { fractions: true };
+  assert.deepEqual(describeHieroglyph(2 / 3, opts), { glyphs: '𓂌', note: '2/3' });
+  assert.deepEqual(describeHieroglyph(5 / 6, opts), { glyphs: '𓂌 𓂋𓏺𓏺𓏺𓏺𓏺𓏺', note: '2/3 + 1/6' });
+  assert.deepEqual(describeHieroglyph(0.75, opts), { glyphs: '𓂌 𓂋𓎆𓏺𓏺', note: '2/3 + 1/12' });
+  assert.deepEqual(describeHieroglyph(1234.75, opts),
+    { glyphs: '𓆼𓍢𓍢𓎆𓎆𓎆𓏺𓏺𓏺𓏺 𓂌 𓂋𓎆𓏺𓏺', note: '1234 + 2/3 + 1/12' });
+  assert.deepEqual(describeHieroglyph(-1 - 2 / 3, opts), { glyphs: '𓏺 𓂌', note: 'negative · 1 + 2/3' });
+  // Just under 2/3 still uses unit fractions only
+  assert.deepEqual(describeHieroglyph(0.65, opts), { glyphs: '𓂋𓏺𓏺 𓂋𓏺𓏺𓏺𓏺𓏺𓏺𓏺 𓂋𓍢𓎆𓎆𓎆𓎆', note: '1/2 + 1/7 + 1/140' });
 });
 
 test('fraction mode falls back to rounding when no simple fraction fits', () => {

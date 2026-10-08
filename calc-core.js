@@ -26,9 +26,12 @@ function toEgyptian(n) {
 }
 
 /* ── Egyptian unit fractions ── */
-// Scribes wrote fractions as sums of distinct unit fractions (3/4 = 1/2 + 1/4),
-// each 1/n drawn as the mouth sign 𓂋 over the numeral n.
+// Scribes wrote fractions as sums of distinct unit fractions, each 1/n drawn
+// as the mouth sign 𓂋 over the numeral n. The one exception was 2/3, which
+// had its own sign 𓂌 and was written first whenever a fraction reached it
+// (5/6 = 2/3 + 1/6).
 const FRACTION_MARK = '𓂋';
+const TWO_THIRDS = '𓂌';
 const MAX_UNIT_FRACTIONS = 5;
 
 // Closest fraction to x (0 < x < 1) with a denominator up to maxDen, found
@@ -77,10 +80,23 @@ function describeFraction(n) {
   const whole = Math.floor(abs);
   if (whole > 9999999) return null;
   const fraction = toFraction(abs - whole);
-  const dens = fraction && unitFractions(...fraction);
+  if (!fraction) return null;
+  let [num, den] = fraction;
+  // Take out 2/3 first when the fraction is at least that big
+  const hasTwoThirds = 3 * num >= 2 * den;
+  if (hasTwoThirds) [num, den] = [3 * num - 2 * den, 3 * den];
+  const dens = num === 0 ? [] : unitFractions(num, den);
   if (!dens) return null;
-  const glyphs = [toEgyptian(whole), ...dens.map(d => FRACTION_MARK + toEgyptian(d))];
-  const terms = [...(whole ? [String(whole)] : []), ...dens.map(d => '1/' + d)];
+  const glyphs = [
+    toEgyptian(whole),
+    ...(hasTwoThirds ? [TWO_THIRDS] : []),
+    ...dens.map(d => FRACTION_MARK + toEgyptian(d)),
+  ];
+  const terms = [
+    ...(whole ? [String(whole)] : []),
+    ...(hasTwoThirds ? ['2/3'] : []),
+    ...dens.map(d => '1/' + d),
+  ];
   return {
     glyphs: glyphs.filter(Boolean).join(' '),
     note: (n < 0 ? 'negative · ' : '') + terms.join(' + '),

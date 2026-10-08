@@ -1,0 +1,12 @@
+{
+  "name": "egyptian-calculator",
+  "private": true,
+  "description": "Development scripts only; the site itself has no dependencies.",
+  "scripts": {
+    "test": "node --test",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "~1.63.0"
+  }
+}

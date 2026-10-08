@@ -20,3 +20,16 @@ jobs:
         run: node --check calc-core.js && node --check calculator.js
       - name: Unit tests
         run: node --test
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Playwright
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Browser tests
+        run: npx playwright test

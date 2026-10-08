@@ -106,10 +106,14 @@ function calculate() {
   showHieroglyph(result);
   justCalculated = true;
 
-  // Gold flash on equals
+  // Gold flash on equals; removing the class and forcing a reflow restarts
+  // the animation when = is pressed again before it finishes
+  exprEl.classList.remove('flash');
+  void exprEl.offsetWidth;
   exprEl.classList.add('flash');
-  setTimeout(() => exprEl.classList.remove('flash'), 300);
 }
+
+exprEl.addEventListener('animationend', () => exprEl.classList.remove('flash'));
 
 function toggleFractions() {
   showFractions = !showFractions;
@@ -117,6 +121,25 @@ function toggleFractions() {
   try { localStorage.setItem('unitFractions', showFractions ? 'on' : 'off'); } catch {}
   showHieroglyph(hieroglyphValue);
 }
+
+/* ── Buttons ── */
+const ACTIONS = {
+  clear: clearAll,
+  sign: toggleSign,
+  percent,
+  decimal: appendDecimal,
+  equals: calculate,
+  fractions: toggleFractions,
+};
+
+document.querySelector('.calculator').addEventListener('click', e => {
+  const button = e.target.closest('button');
+  if (!button) return;
+  const { digit, op, action } = button.dataset;
+  if (digit) appendNum(digit);
+  else if (op) appendOp(op);
+  else if (action) ACTIONS[action]();
+});
 
 /* ── Keyboard support ── */
 document.addEventListener('keydown', e => {
@@ -134,7 +157,7 @@ document.addEventListener('keydown', e => {
     justCalculated = false;
     updateDisplay();
   }
-  else if (e.key === 'Escape') clearAll();
+  else if (e.key === 'Escape' || e.key === 'Delete' || e.key === 'c' || e.key === 'C') clearAll();
   else if (e.key === '%') percent();
   else if (e.key === 'f' || e.key === 'F') toggleFractions();
   else return;

@@ -88,14 +88,17 @@ EgyptianCalculator/
 ├── style.css        # Egyptian theming & animations
 ├── calc-core.js     # Pure logic: hieroglyphic conversion, evaluation, input editing
 ├── calculator.js    # Display, buttons & keyboard
-└── tests/           # Unit tests for calc-core.js
+└── tests/           # Unit tests (*.test.js) and browser tests (*.spec.js)
 ```
 
-**Running the tests** (needs [Node.js](https://nodejs.org/) 18+, nothing to install):
+**Running the tests** (needs [Node.js](https://nodejs.org/) 18+):
 ```bash
-node --test
+node --test               # unit tests, nothing to install
+npm install               # once, for the browser tests
+npx playwright install chromium
+npm run test:browser      # drives the real page in a headless browser
 ```
-They also run automatically on every pull request.
+Both run automatically on every pull request. The browser tests serve the page with `python3 -m http.server`.
 
 ---
 
@@ -108,7 +111,7 @@ They also run automatically on every pull request.
 | `.` | Decimal point |
 | `Enter` or `=` | Calculate |
 | `Backspace` | Delete last character |
-| `Escape` | Clear all |
+| `Escape`, `Delete` or `C` | Clear all |
 | `%` | Percent |
 | `F` | Toggle unit fractions |
 

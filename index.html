@@ -19,6 +19,9 @@
   <meta property="og:image:alt" content="The Egyptian Calculator showing a sum and its answer in hieroglyphs" />
   <meta name="twitter:card" content="summary_large_image" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -47,7 +50,7 @@
         </div>
 
         <div class="mode-row">
-          <button class="mode-toggle" id="fraction-toggle" onclick="toggleFractions()"
+          <button class="mode-toggle" id="fraction-toggle" data-action="fractions"
                   aria-pressed="false" title="Show fractions as Egyptian unit fractions (F)">
             <span aria-hidden="true">𓂋 </span>Unit fractions
           </button>
@@ -55,33 +58,33 @@
 
         <div class="button-grid">
           <!-- Row 1 -->
-          <button class="btn btn-fn" onclick="clearAll()" aria-label="All clear">AC</button>
-          <button class="btn btn-fn" onclick="toggleSign()" aria-label="Toggle sign">+/−</button>
-          <button class="btn btn-fn" onclick="percent()" aria-label="Percent">%</button>
-          <button class="btn btn-op" onclick="appendOp('÷')" aria-label="Divide">𓌀 ÷</button>
+          <button class="btn btn-fn" data-action="clear" aria-label="All clear">AC</button>
+          <button class="btn btn-fn" data-action="sign" aria-label="Toggle sign">+/−</button>
+          <button class="btn btn-fn" data-action="percent" aria-label="Percent">%</button>
+          <button class="btn btn-op" data-op="÷" aria-label="Divide">𓌀 ÷</button>
 
           <!-- Row 2 -->
-          <button class="btn btn-num" onclick="appendNum('7')">7</button>
-          <button class="btn btn-num" onclick="appendNum('8')">8</button>
-          <button class="btn btn-num" onclick="appendNum('9')">9</button>
-          <button class="btn btn-op" onclick="appendOp('×')" aria-label="Multiply">× 𓆣</button>
+          <button class="btn btn-num" data-digit="7">7</button>
+          <button class="btn btn-num" data-digit="8">8</button>
+          <button class="btn btn-num" data-digit="9">9</button>
+          <button class="btn btn-op" data-op="×" aria-label="Multiply">× 𓆣</button>
 
           <!-- Row 3 -->
-          <button class="btn btn-num" onclick="appendNum('4')">4</button>
-          <button class="btn btn-num" onclick="appendNum('5')">5</button>
-          <button class="btn btn-num" onclick="appendNum('6')">6</button>
-          <button class="btn btn-op" onclick="appendOp('−')" aria-label="Subtract">− 𓏏</button>
+          <button class="btn btn-num" data-digit="4">4</button>
+          <button class="btn btn-num" data-digit="5">5</button>
+          <button class="btn btn-num" data-digit="6">6</button>
+          <button class="btn btn-op" data-op="−" aria-label="Subtract">− 𓏏</button>
 
           <!-- Row 4 -->
-          <button class="btn btn-num" onclick="appendNum('1')">1</button>
-          <button class="btn btn-num" onclick="appendNum('2')">2</button>
-          <button class="btn btn-num" onclick="appendNum('3')">3</button>
-          <button class="btn btn-op" onclick="appendOp('+')" aria-label="Add">𓇋 +</button>
+          <button class="btn btn-num" data-digit="1">1</button>
+          <button class="btn btn-num" data-digit="2">2</button>
+          <button class="btn btn-num" data-digit="3">3</button>
+          <button class="btn btn-op" data-op="+" aria-label="Add">𓇋 +</button>
 
           <!-- Row 5 -->
-          <button class="btn btn-num btn-zero" onclick="appendNum('0')">0</button>
-          <button class="btn btn-num" onclick="appendDecimal()" aria-label="Decimal point">.</button>
-          <button class="btn btn-equals" onclick="calculate()" aria-label="Equals">𓋹 =</button>
+          <button class="btn btn-num btn-zero" data-digit="0">0</button>
+          <button class="btn btn-num" data-action="decimal" aria-label="Decimal point">.</button>
+          <button class="btn btn-equals" data-action="equals" aria-label="Equals">𓋹 =</button>
         </div>
       </div>
 

@@ -108,7 +108,7 @@ They also run automatically on every pull request.
 | `.` | Decimal point |
 | `Enter` or `=` | Calculate |
 | `Backspace` | Delete last character |
-| `Escape` | Clear all |
+| `Escape`, `Delete` or `C` | Clear all |
 | `%` | Percent |
 | `F` | Toggle unit fractions |
 

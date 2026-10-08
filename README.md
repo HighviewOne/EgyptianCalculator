@@ -22,7 +22,7 @@
 
 <br />
 
-<img src="screenshot.png" alt="Egyptian Calculator screenshot" width="480" />
+<img src="screenshot.jpg" alt="Egyptian Calculator showing 1234+567 = 1801 with the answer in hieroglyphs" width="480" />
 
 </div>
 

@@ -95,10 +95,10 @@ EgyptianCalculator/
 ```bash
 node --test               # unit tests, nothing to install
 npm install               # once, for the browser tests
-npx playwright install chromium
-npm run test:browser      # drives the real page in a headless browser
+npx playwright install chromium firefox webkit
+npm run test:browser      # drives the real page in Chrome, Firefox and Safari's engine
 ```
-Both run automatically on every pull request. The browser tests serve the page with `python3 -m http.server`.
+Both run automatically on every pull request. The browser tests serve the page with `python3 -m http.server` and run in desktop Chrome, Firefox and WebKit (Safari's engine), plus iPhone- and Android-sized touch screens. To try one browser locally: `npx playwright test --project firefox`.
 
 ---
 

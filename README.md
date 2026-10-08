@@ -108,6 +108,8 @@ They also run automatically on every pull request.
 | `Escape` | Clear all |
 | `%` | Percent |
 
+`%` works like a phone calculator: after `+` or `−` it takes that percent of what comes before (`50 + 10 %` → `50 + 5` = 55); otherwise it divides the last number by 100 (`50 × 10 %` → `50 × 0.1` = 5).
+
 ---
 
 ## 𓋹 Contributing

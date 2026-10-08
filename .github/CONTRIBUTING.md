@@ -11,14 +11,16 @@ Thank you for offering tribute to the Pharaoh's calculator! Here's how to get st
 5. **Test** by opening `index.html` in a browser, and run the unit tests with `node --test` (and `npm run test:browser` for the browser tests — see the README)
 6. **Commit**: `git commit -m "Add: your description"`
 7. **Push**: `git push origin feature/your-idea`
-8. **Open a Pull Request** against `main`
+8. **Open a Pull Request** against `main` — merging publishes to the live site
 
 ## 𓆣 Guidelines
 
 - Keep the Egyptian aesthetic — gold `#f0c040`, bronze `#b87333`, dark backgrounds, Cinzel font
+- Anything that shows hieroglyphs should include `var(--glyph-font)` in its `font-family`, or the glyphs show as empty boxes on many systems
 - No external dependencies or build tools — pure HTML/CSS/JS only (Playwright is a development-only dependency for the browser tests)
 - Logic that doesn't touch the page goes in `calc-core.js`, with a test in `tests/`
-- Test in at least Chrome and Firefox before submitting
+- Every pull request runs the tests in Chrome, Firefox, WebKit (Safari's engine) and on phone-sized screens; still look at visual changes yourself
+- New buttons need an `aria-label` if their text includes glyphs, and new behaviour needs a browser test in `tests/browser.spec.js`
 - Use the PR template and fill it out fully
 
 ## 𓋹 Reporting Bugs

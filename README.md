@@ -38,15 +38,17 @@
 | 𓆼 **Read the Glyphs** | Hover or tap any hieroglyph to see what it's worth (𓆼 lotus flower · 1,000) |
 | 𓂋 **Unit Fractions** | Optional Egyptian-style fractions: 2/7 = 1/4 + 1/28, with the special 2/3 sign 𓂌 |
 | 𓋹 **Live Preview** | Answer appears as you type — no need to hit equals first |
-| 𓌀 **Keyboard Support** | Numbers, operators, Enter, Backspace, Escape all work |
+| 𓌀 **Keyboard Support** | Every button has a key, plus `F` for unit fractions — see Keyboard Shortcuts below |
+| 𓀀 **Accessible** | Spoken button names and readings, visible focus, honours reduced-motion settings |
 | 𓇋 **No Dependencies** | Pure HTML · CSS · JS — zero build steps, zero frameworks |
-| 𓉐 **Responsive** | Works on desktop and mobile |
+| 𓉐 **Responsive** | Works on desktop and phones, down to 320px wide |
+| 𓊹 **Tested** | Unit tests plus browser tests in Chrome, Firefox, Safari's engine and phone screens on every pull request |
 
 ---
 
 ## 𓆼 Live Demo
 
-**[highviewone.github.io/EgyptianCalculator](https://highviewone.github.io/EgyptianCalculator/)**
+**[highviewone.github.io/EgyptianCalculator](https://highviewone.github.io/EgyptianCalculator/)** — published by GitHub Pages from `main`, so every merge goes live within a couple of minutes.
 
 ---
 
@@ -85,11 +87,17 @@ open index.html   # macOS
 **File structure:**
 ```
 EgyptianCalculator/
-├── index.html       # Structure & layout
-├── style.css        # Egyptian theming & animations
-├── calc-core.js     # Pure logic: hieroglyphic conversion, evaluation, input editing
-├── calculator.js    # Display, buttons & keyboard
-└── tests/           # Unit tests (*.test.js) and browser tests (*.spec.js)
+├── index.html            # Structure, layout & link-preview tags
+├── style.css             # Egyptian theming & animations
+├── calc-core.js          # Pure logic: numerals, fractions, glyph readings, evaluation, input editing
+├── calculator.js         # Display, buttons, keyboard & glyph explanations
+├── favicon.svg           # Gold ankh tab icon
+├── og-image.jpg          # Link-preview image (1200×630)
+├── screenshot.jpg        # README screenshot
+├── tests/                # Unit tests (*.test.js) and browser tests (*.spec.js)
+├── package.json          # Test scripts; Playwright is the only (development) dependency
+├── playwright.config.js  # Browser-test setup: local server and the five browser/screen setups
+└── .github/workflows/    # Runs both test suites on every pull request
 ```
 
 **Running the tests** (needs [Node.js](https://nodejs.org/) 18+):

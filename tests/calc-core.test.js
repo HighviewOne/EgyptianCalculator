@@ -73,8 +73,29 @@ test('evalExpression handles the calculator symbols', () => {
   assert.equal(evalExpression('5÷0'), Infinity);
 });
 
+test('evalExpression follows operator precedence and parentheses', () => {
+  assert.equal(evalExpression('2+3×4'), 14);
+  assert.equal(evalExpression('(2+3)×4'), 20);
+  assert.equal(evalExpression('2×(3+(4−1))'), 12);
+  assert.equal(evalExpression('10−4−3'), 3);
+  assert.equal(evalExpression('100÷10÷2'), 5);
+  assert.equal(evalExpression('-(2+3)'), -5);
+  assert.equal(evalExpression('--5'), 5);
+  assert.equal(evalExpression('-2×-3'), 6);
+});
+
+test('evalExpression reads every number form the calculator produces', () => {
+  assert.equal(evalExpression('5.'), 5);
+  assert.equal(evalExpression('.5'), 0.5);
+  assert.equal(evalExpression('0.25'), 0.25);
+  assert.equal(evalExpression('1.11111111111e-8+5'), 5.00000001111111111);
+  assert.equal(evalExpression('-1e-8'), -1e-8);
+  assert.ok(Number.isNaN(evalExpression('0÷0')));
+});
+
 test('evalExpression rejects empty, unfinished and unsafe input', () => {
-  for (const expr of ['', '5+', '-', '-×3', 'alert(1)', 'this', '5;1']) {
+  for (const expr of ['', '5+', '-', '-×3', 'alert(1)', 'this', '5;1',
+    '(2+3', '2+3)', '()', '5 5', '1e+', '1..2', '2(3)', 'constructor', '1e3e3']) {
     assert.equal(evalExpression(expr), null, `expr = ${expr}`);
   }
 });

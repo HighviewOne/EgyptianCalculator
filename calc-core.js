@@ -25,19 +25,102 @@ function toEgyptian(n) {
   return result;
 }
 
+/* ── Egyptian unit fractions ── */
+// Scribes wrote fractions as sums of distinct unit fractions, each 1/n drawn
+// as the mouth sign 𓂋 over the numeral n. The one exception was 2/3, which
+// had its own sign 𓂌 and was written first whenever a fraction reached it
+// (5/6 = 2/3 + 1/6).
+const FRACTION_MARK = '𓂋';
+const TWO_THIRDS = '𓂌';
+const MAX_UNIT_FRACTIONS = 5;
+
+// Closest fraction to x (0 < x < 1) with a denominator up to maxDen, found
+// with continued fractions. Null if none matches to within floating-point noise.
+function toFraction(x, maxDen = 10000) {
+  let [h0, h1, k0, k1] = [0, 1, 1, 0];
+  let y = x;
+  for (let i = 0; i < 64; i++) {
+    const a = Math.floor(y);
+    [h0, h1] = [h1, a * h1 + h0];
+    [k0, k1] = [k1, a * k1 + k0];
+    if (k1 > maxDen) return null;
+    if (Math.abs(x - h1 / k1) <= 1e-9) return [h1, k1];
+    y = 1 / (y - a);
+  }
+  return null;
+}
+
+// Denominators of num/den as distinct unit fractions, using the greedy
+// (Fibonacci–Sylvester) method: 3/4 → [2, 4]. Null if it needs more than
+// MAX_UNIT_FRACTIONS terms or a denominator too large for hieroglyphs.
+function unitFractions(num, den) {
+  let [n, d] = [BigInt(num), BigInt(den)];
+  const dens = [];
+  while (n > 0n) {
+    const next = (d + n - 1n) / n;  // ceil(d / n)
+    if (dens.length === MAX_UNIT_FRACTIONS || next > 9999999n) return null;
+    dens.push(Number(next));
+    // n/d − 1/next, reduced
+    [n, d] = [n * next - d, d * next];
+    const g = gcd(n, d);
+    [n, d] = [n / g, d / g];
+  }
+  return dens;
+}
+
+function gcd(a, b) {
+  while (b) [a, b] = [b, a % b];
+  return a;
+}
+
+// Whole part and unit fractions for a non-integer, or null if the fraction
+// can't be written that way
+function describeFraction(n) {
+  const abs = Math.abs(n);
+  const whole = Math.floor(abs);
+  if (whole > 9999999) return null;
+  const fraction = toFraction(abs - whole);
+  if (!fraction) return null;
+  let [num, den] = fraction;
+  // Take out 2/3 first when the fraction is at least that big
+  const hasTwoThirds = 3 * num >= 2 * den;
+  if (hasTwoThirds) [num, den] = [3 * num - 2 * den, 3 * den];
+  const dens = num === 0 ? [] : unitFractions(num, den);
+  if (!dens) return null;
+  const glyphs = [
+    toEgyptian(whole),
+    ...(hasTwoThirds ? [TWO_THIRDS] : []),
+    ...dens.map(d => FRACTION_MARK + toEgyptian(d)),
+  ];
+  const terms = [
+    ...(whole ? [String(whole)] : []),
+    ...(hasTwoThirds ? ['2/3'] : []),
+    ...dens.map(d => '1/' + d),
+  ];
+  return {
+    glyphs: glyphs.filter(Boolean).join(' '),
+    note: (n < 0 ? 'negative · ' : '') + terms.join(' + '),
+  };
+}
+
 // Glyphs plus a short caveat when they can't show the number exactly:
-// the Egyptian system has no zero, no negatives, no decimals, and tops out
-// below ten million.
-function describeHieroglyph(n) {
+// the Egyptian system has no zero, no negatives, and tops out below ten
+// million. Decimals are rounded unless `fractions` asks for unit fractions.
+function describeHieroglyph(n, { fractions = false } = {}) {
   if (!Number.isFinite(n)) return { glyphs: '', note: '' };
+  if (fractions && !Number.isInteger(n)) {
+    const described = describeFraction(n);
+    if (described) return described;
+  }
   const rounded = Math.round(Math.abs(n));
   if (rounded > 9999999) return { glyphs: '', note: 'too large for hieroglyphs' };
   if (rounded === 0) {
-    return { glyphs: '', note: n === 0 ? 'no hieroglyph for zero' : 'rounds to 0 — no hieroglyph for zero' };
+    if (n === 0) return { glyphs: '', note: 'no hieroglyph for zero' };
+    return { glyphs: '', note: fractions ? 'rounds to 0 (no simple fraction)' : 'rounds to 0 — no hieroglyph for zero' };
   }
   const notes = [];
   if (n < 0) notes.push('negative');
-  if (!Number.isInteger(n)) notes.push('≈ rounded');
+  if (!Number.isInteger(n)) notes.push(fractions ? '≈ rounded (no simple fraction)' : '≈ rounded');
   return { glyphs: toEgyptian(rounded), note: notes.join(' · ') };
 }
 
@@ -165,7 +248,7 @@ function withPercent(expr) {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    toEgyptian, describeHieroglyph, formatNum, evalExpression,
+    toEgyptian, toFraction, unitFractions, describeHieroglyph, formatNum, evalExpression,
     withDigit, withOp, withDecimal, withPercent,
   };
 }

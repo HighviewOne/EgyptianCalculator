@@ -35,6 +35,7 @@
 | 𓂀 **Egyptian Aesthetic** | Dark starfield sky, gold/bronze palette, temple pillars, Eye of Ra |
 | 𓏏 **Hieroglyphic Numerals** | Results displayed in authentic ancient Egyptian number glyphs |
 | 𓆣 **Full Calculator** | Addition, subtraction, multiplication, division, %, sign toggle, decimals |
+| 𓂋 **Unit Fractions** | Optional Egyptian-style fractions: 2/7 = 1/4 + 1/28, with the special 2/3 sign 𓂌 |
 | 𓋹 **Live Preview** | Answer appears as you type — no need to hit equals first |
 | 𓌀 **Keyboard Support** | Numbers, operators, Enter, Backspace, Escape all work |
 | 𓇋 **No Dependencies** | Pure HTML · CSS · JS — zero build steps, zero frameworks |
@@ -61,6 +62,8 @@ Numbers are converted to ancient Egyptian hieroglyphics in real time:
 | Coiled Rope | 100 | 𓍢 |
 | Hobble | 10 | 𓎆 |
 | Stroke | 1 | 𓏺 |
+
+Turn on **Unit fractions** to see the fractional part of an answer the way scribes wrote it, as a sum of distinct unit fractions (2/7 = 1/4 + 1/28). Each 1/n is the mouth sign 𓂋 followed by the numeral for n. The one exception is 2/3, which had its own sign 𓂌 and comes first whenever a fraction reaches it, as in the Rhind Papyrus (3/4 = 2/3 + 1/12). If an answer has no simple fraction (like π), or the split would need more than five terms, it is rounded as usual.
 
 > Numbers up to **9,999,999** are supported in hieroglyphic form. The Egyptian system had no zero, negatives or decimals, so a short note under the glyphs flags when a result is negative, rounded, zero or too large.
 
@@ -107,6 +110,7 @@ They also run automatically on every pull request.
 | `Backspace` | Delete last character |
 | `Escape` | Clear all |
 | `%` | Percent |
+| `F` | Toggle unit fractions |
 
 `%` works like a phone calculator: after `+` or `−` it takes that percent of what comes before (`50 + 10 %` → `50 + 5` = 55); otherwise it divides the last number by 100 (`50 × 10 %` → `50 × 0.1` = 5).
 

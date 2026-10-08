@@ -115,8 +115,17 @@ function evalExpression(expr) {
 /* ── Input editing: each takes the expression and returns the new one ── */
 const OPS = '÷×−+';
 
+// The number at the end of the expression, sign and exponent included
+// ("-3" in "5×-3", "1e+21" in "2+1e+21"), or '' if it ends in an operator
+function lastNumber(expr) {
+  const match = expr.match(/-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/);
+  return match ? match[0] : '';
+}
+
 function withDigit(expr, digit) {
-  // Replace a lone leading zero — strict mode rejects literals like "05"
+  // A result like 1e-8 is complete; more digits would land in the exponent
+  if (lastNumber(expr).includes('e')) return expr;
+  // Replace a lone leading zero so "0" then "7" reads 7, not 07
   const current = expr.split(/[÷×−+]/).pop();
   if (current === '0' || current === '-0') expr = expr.slice(0, -1);
   return expr + digit;
@@ -131,15 +140,32 @@ function withOp(expr, op) {
 }
 
 function withDecimal(expr) {
+  if (lastNumber(expr).includes('e')) return expr;
   // Only add dot if the current number segment doesn't already have one
   const last = expr.split(/[÷×−+]/).pop();
   if (last === '' || last === '-') expr += '0';
   return last.includes('.') ? expr : expr + '.';
 }
 
+// Works like a phone calculator: after + or − it takes that percent of
+// everything before it (50+10% → 50+5); otherwise it divides the last
+// number by 100 (50×10% → 50×0.1, 10% → 0.1)
+function withPercent(expr) {
+  const num = lastNumber(expr);
+  if (!num) return expr;
+  const head = expr.slice(0, -num.length);
+  let value = Number(num) / 100;
+  if (head.endsWith('+') || head.endsWith('−')) {
+    const base = evalExpression(head.slice(0, -1));
+    if (base === null) return expr;
+    value *= base;
+  }
+  return Number.isFinite(value) ? head + formatNum(value) : expr;
+}
+
 if (typeof module !== 'undefined') {
   module.exports = {
     toEgyptian, describeHieroglyph, formatNum, evalExpression,
-    withDigit, withOp, withDecimal,
+    withDigit, withOp, withDecimal, withPercent,
   };
 }

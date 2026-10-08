@@ -67,13 +67,9 @@ function toggleSign() {
 }
 
 function percent() {
-  if (!expression) return;
-  const val = evalExpression(expression);
-  if (val !== null) {
-    expression = formatNum(val / 100);
-    justCalculated = false;
-    updateDisplay();
-  }
+  expression = withPercent(expression);
+  justCalculated = false;
+  updateDisplay();
 }
 
 function calculate() {

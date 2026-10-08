@@ -3,7 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   toEgyptian, describeHieroglyph, formatNum, evalExpression,
-  withDigit, withOp, withDecimal,
+  withDigit, withOp, withDecimal, withPercent,
 } = require('../calc-core.js');
 
 // Builds an expression from button presses, e.g. type('5×−3')
@@ -142,4 +142,34 @@ test('decimal points', () => {
   assert.equal(type('5×−.'), '5×-0.');
   assert.equal(type('1.2.3'), '1.23');
   assert.equal(type('1.2+3.4'), '1.2+3.4');
+});
+
+test('percent after + or − takes that percent of what comes before', () => {
+  assert.equal(withPercent('50+10'), '50+5');
+  assert.equal(evalExpression(withPercent('50+10')), 55);
+  assert.equal(withPercent('50−10'), '50−5');
+  assert.equal(withPercent('2×3+10'), '2×3+0.6');
+  assert.equal(withPercent('50+-10'), '50+-5');
+});
+
+test('percent elsewhere divides the last number by 100', () => {
+  assert.equal(withPercent('10'), '0.1');
+  assert.equal(withPercent('50×10'), '50×0.1');
+  assert.equal(withPercent('50÷25'), '50÷0.25');
+  assert.equal(withPercent('-10'), '-0.1');
+  assert.equal(withPercent('5×-3'), '5×-0.03');
+});
+
+test('percent leaves unfinished input alone', () => {
+  for (const expr of ['', '50+', '5×-', '5÷0+10']) {
+    assert.equal(withPercent(expr), expr, `expr = ${expr}`);
+  }
+});
+
+test('digits and decimal points are ignored after a result like 1e-8', () => {
+  assert.equal(withDigit('1e-8', '5'), '1e-8');
+  assert.equal(withDigit('-1e-8', '5'), '-1e-8');
+  assert.equal(withDecimal('1e+21'), '1e+21');
+  assert.equal(withDigit('1e+21+', '5'), '1e+21+5');
+  assert.equal(withDigit('2+1e+21', '5'), '2+1e+21');
 });

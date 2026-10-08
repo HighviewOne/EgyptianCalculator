@@ -361,8 +361,9 @@ h1 {
   box-shadow: 0 3px 16px #00000099, 0 0 24px #f0c04088;
 }
 
-/* Wide zero button */
-.btn-zero {
+/* Wide zero and backspace buttons */
+.btn-zero,
+.btn-wide {
   grid-column: span 2;
 }
 

@@ -5,6 +5,7 @@ const {
   toEgyptian, toFraction, unitFractions, describeHieroglyph, readGlyphs,
   formatNum, evalExpression,
   withDigit, withOp, withDecimal, withPercent,
+  withOpenParen, withCloseParen, withClosedParens,
 } = require('../calc-core.js');
 
 // Builds an expression from button presses, e.g. type('5×−3')
@@ -14,6 +15,8 @@ function type(keys) {
   for (const k of keys) {
     if (k >= '0' && k <= '9') expr = withDigit(expr, k);
     else if (k === '.') expr = withDecimal(expr);
+    else if (k === '(') expr = withOpenParen(expr);
+    else if (k === ')') expr = withCloseParen(expr);
     else expr = withOp(expr, k);
   }
   return expr;
@@ -260,4 +263,49 @@ test('readGlyphs treats each fraction as one piece', () => {
 
 test('readGlyphs of an empty line is empty', () => {
   assert.deepEqual(readGlyphs(''), { parts: [], reading: '' });
+});
+
+test('brackets group and nest', () => {
+  assert.equal(calc('(2+3)×4'), 20);
+  assert.equal(calc('((1+2)×(3−1))÷2'), 3);
+  assert.equal(calc('(−5)×2'), -10);
+  assert.equal(calc('5−(−(2))'), 7);
+});
+
+test('a number or bracket straight after another means multiply', () => {
+  assert.equal(type('2(3+4)'), '2×(3+4)');
+  assert.equal(type('(2+3)4'), '(2+3)×4');
+  assert.equal(type('(2+3)(1+1)'), '(2+3)×(1+1)');
+  assert.equal(type('(2+3).5'), '(2+3)×0.5');
+});
+
+test('closing brackets only when one is open and something is inside', () => {
+  assert.equal(type('5)'), '5');
+  assert.equal(type('()'), '(');
+  assert.equal(type('(2+)'), '(2+');
+  assert.equal(type('(2))'), '(2)');
+});
+
+test('operators and decimals right after an opening bracket', () => {
+  assert.equal(type('(×5'), '(5');
+  assert.equal(type('(−5'), '(-5');
+  assert.equal(type('(−+5'), '(5');
+  assert.equal(type('(.5'), '(0.5');
+  assert.equal(type('(07'), '(7');
+});
+
+test('unclosed brackets are closed for the answer', () => {
+  assert.equal(withClosedParens('(2+3'), '(2+3)');
+  assert.equal(withClosedParens('((1+2)×(3'), '((1+2)×(3))');
+  assert.equal(withClosedParens('(2+3)'), '(2+3)');
+  assert.equal(evalExpression(withClosedParens(type('(2+3'))), 5);
+  assert.equal(evalExpression(withClosedParens(type('1+('))), null);
+});
+
+test('percent inside brackets uses the bracketed total', () => {
+  assert.equal(withPercent('(50+10'), '(50+5');
+  assert.equal(withPercent('2×(50+10'), '2×(50+5');
+  assert.equal(withPercent('(2+3)'), '(2+3)');
+  assert.equal(withPercent('(2+3)+10'), '(2+3)+0.5');
+  assert.equal(withPercent('10×(2+(50+10'), '10×(2+(50+5');
 });

@@ -83,8 +83,16 @@ open index.html   # macOS
 EgyptianCalculator/
 ├── index.html       # Structure & layout
 ├── style.css        # Egyptian theming & animations
-└── calculator.js    # Logic & hieroglyphic conversion
+├── calc-core.js     # Pure logic: hieroglyphic conversion, evaluation, input editing
+├── calculator.js    # Display, buttons & keyboard
+└── tests/           # Unit tests for calc-core.js
 ```
+
+**Running the tests** (needs [Node.js](https://nodejs.org/) 18+, nothing to install):
+```bash
+node --test
+```
+They also run automatically on every pull request.
 
 ---
 

@@ -89,8 +89,14 @@ hierEl.addEventListener('focus', () => {
 });
 hierEl.addEventListener('blur', () => explain(''));
 
+// Long expressions wrap after an operator rather than in the middle of a number
+function showExpression(text) {
+  exprEl.replaceChildren(...text.split(/(?<=[+\-−×÷])/).flatMap((piece, i) =>
+    i ? [document.createElement('wbr'), piece] : [piece]));
+}
+
 function updateDisplay() {
-  exprEl.textContent = expression || '0';
+  showExpression(expression || '0');
 
   // Live preview while typing, with any open brackets closed
   const preview = evalExpression(withClosedParens(expression));

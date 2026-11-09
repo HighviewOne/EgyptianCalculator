@@ -192,3 +192,32 @@ for (const width of [320, 375, 1280]) {
     }
   });
 }
+
+test('the largest number shows every glyph, wrapping instead of clipping', async ({ page }) => {
+  await page.keyboard.type('9999999');
+  await expect(glyphs(page).locator('.glyph')).toHaveCount(63);
+  const fits = await glyphs(page).evaluate(el => el.scrollWidth <= el.clientWidth);
+  expect(fits).toBe(true);
+});
+
+test('a long expression wraps after an operator, not inside a number', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.keyboard.type('(1234+5678)*(91011-1213)/1415');
+  await expect(display(page)).toHaveText('(1234+5678)×(91011−1213)÷1415');
+  // Each line of the display starts with a whole number or bracket, never mid-number
+  const lineStarts = await display(page).evaluate(el => {
+    const range = document.createRange(), starts = [];
+    let lastTop = -1;
+    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let node; (node = walk.nextNode());) {
+      for (let i = 0; i < node.length; i++) {
+        range.setStart(node, i); range.setEnd(node, i + 1);
+        const top = Math.round(range.getBoundingClientRect().top);
+        if (top > lastTop + 2) { starts.push(node.data.slice(0, i).slice(-1) || node.previousSibling?.nodeName || ''); lastTop = top; }
+      }
+    }
+    return starts;
+  });
+  expect(lineStarts.length).toBeGreaterThan(1);
+  for (const before of lineStarts.slice(1)) expect(before).toBe('WBR');
+});

@@ -4,7 +4,8 @@
   "description": "Development scripts only; the site itself has no dependencies.",
   "scripts": {
     "test": "node --test",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "shots": "playwright test -c playwright.shots.config.js"
   },
   "devDependencies": {
     "@playwright/test": "~1.63.0"

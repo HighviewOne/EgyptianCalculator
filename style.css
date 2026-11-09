@@ -63,6 +63,7 @@ body {
 }
 h1 {
   font-family: 'Cinzel Decorative', var(--glyph-font), serif;
+  font-kerning: none;   /* its H–E kerning pair overlaps the letters: "THE" read like "TĦE" */
   font-size: clamp(1.1rem, 3vw, 2rem);
   color: #f0c040;
   letter-spacing: 0.12em;
@@ -180,7 +181,7 @@ h1 {
   line-height: 1.3;
   min-height: 1.3em;
   text-align: right;
-  word-break: break-all;
+  overflow-wrap: anywhere;   /* Chromium never breaks hieroglyphs for word-break: break-all */
 }
 .display-hieroglyph .glyph {
   cursor: help;
@@ -218,7 +219,7 @@ h1 {
   font-size: 1.6rem;
   color: #a8d060;
   text-align: right;
-  word-break: break-all;
+  overflow-wrap: anywhere;   /* breaks at the <wbr> after operators first */
   text-shadow: 0 0 8px #6ab03044;
   line-height: 1.3;
 }
@@ -392,6 +393,8 @@ h1 {
   .pillar-body { width: 12px; }
   .btn { padding: 13px 4px; font-size: 0.9rem; }
   h1 { font-size: 1rem; }
+  h1 > [aria-hidden] { display: none; }   /* the big eye above already frames the title */
+  .hieroglyph-strip { font-size: 0.95rem; letter-spacing: 0.12em; }
 }
 
 /* ── Reduced motion ── */
